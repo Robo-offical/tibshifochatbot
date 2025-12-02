@@ -1,0 +1,2 @@
+REM Procfile yaratish (Render uchun)
+echo web: python main.py > Procfile

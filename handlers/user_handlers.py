@@ -68,7 +68,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         request_count = len(user_requests) if user_requests else 0
         
         welcome_text = (
-            f"👋 Salom {user.first_name}! Manga support botiga xush kelibsiz!\n\n"
+            f"👋 Salom {user.first_name}! Tib Shifo support botiga xush kelibsiz!\n\n"
             f"📅 Joriy vaqt: {time_str}\n"
             f"⏰ {get_working_hours_message()}\n\n"
         )
@@ -180,10 +180,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_user_activity(user.id)
     
     text = (
-        f"ℹ️ {user.first_name}, bot yordami:\n\n"
+        f"ℹ️ {user.first_name}, Tib Shifo support bot yordami:\n\n"
         
         f"📌 ASOSIY FUNKSIYALAR:\n"
-        f"1. '📨 Murojaat yuborish' - Manga haqida so'rov yuborish\n"
+        f"1. '📨 Murojaat yuborish' - Tib Shifo kanali haqida yoki boshqa masalada so'rov yuborish\n"
         f"2. '📋 Mening so'rovlarim' - Yuborgan so'rovlaringiz holati\n"
         f"3. '🕐 Ish vaqtlari' - Adminlar ish vaqtlari\n\n"
         
@@ -198,7 +198,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📌 QO'LLANMA:\n"
         f"1. Avval @{config.CHANNEL_USERNAME} kanaliga obuna bo'ling\n"
         f"2. '📨 Murojaat yuborish' tugmasini bosing\n"
-        f"3. Manga nomi, qism raqami yoki muammoingizni yozing\n"
+        f"3. kanal yoki boshqa masaladagi so'rovingizni yozing\n"
         f"4. Adminlar so'rovingizni ko'rib chiqib javob beradi\n\n"
         
         f"📌 ESLATMALAR:\n"
@@ -242,9 +242,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             f"✍️ {user.first_name}, murojaatingiz matnini yozing:\n\n"
             f"📌 Masalan:\n"
-            f"• 'One Piece manga 1050-qismi kerak'\n"
-            f"• 'Naruto manga ingliz tilida'\n"
-            f"• 'Attack on Titan oxirgi qismi'\n\n"
+            f"• 'Tib Shifo kanali haqida malumot'\n"
+            f"• 'Kanal qanday materiallar beradi?'\n"
+            f"• 'boshqa tibbiyotga oid savollar'\n\n"
             f"⏰ {response_time}\n"
             f"🕐 Ish vaqtlari: 09:00 - 18:00\n\n"
             f"📝 Yorqin va aniq yozishingiz javob tezligini oshiradi!",
