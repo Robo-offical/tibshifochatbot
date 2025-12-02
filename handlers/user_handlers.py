@@ -68,7 +68,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         request_count = len(user_requests) if user_requests else 0
         
         welcome_text = (
-            f"👋 Salom {user.first_name}! Tib Shifo kanalining support botiga xush kelibsiz!\n\n"
+            f"👋 Salom {user.first_name}! Manga support botiga xush kelibsiz!\n\n"
             f"📅 Joriy vaqt: {time_str}\n"
             f"⏰ {get_working_hours_message()}\n\n"
         )
@@ -180,10 +180,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_user_activity(user.id)
     
     text = (
-        f"ℹ️ {user.first_name}, Tib Shifo kanal support bot yordami:\n\n"
+        f"ℹ️ {user.first_name}, bot yordami:\n\n"
         
         f"📌 ASOSIY FUNKSIYALAR:\n"
-        f"1. '📨 Murojaat yuborish' - Tib Shifo kanali yoki boshqa masalada haqida so'rov yuborish\n"
+        f"1. '📨 Murojaat yuborish' - Manga haqida so'rov yuborish\n"
         f"2. '📋 Mening so'rovlarim' - Yuborgan so'rovlaringiz holati\n"
         f"3. '🕐 Ish vaqtlari' - Adminlar ish vaqtlari\n\n"
         
@@ -198,7 +198,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📌 QO'LLANMA:\n"
         f"1. Avval @{config.CHANNEL_USERNAME} kanaliga obuna bo'ling\n"
         f"2. '📨 Murojaat yuborish' tugmasini bosing\n"
-        f"3. Tib Shifo kanaliga oid masala/muammo yoki kanalga oid bo'lmagan muammoyingizni yozing\n"
+        f"3. Manga nomi, qism raqami yoki muammoingizni yozing\n"
         f"4. Adminlar so'rovingizni ko'rib chiqib javob beradi\n\n"
         
         f"📌 ESLATMALAR:\n"
@@ -240,14 +240,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response_time = get_response_time_estimate()
         
         await update.message.reply_text(
-            f"✍️ {user.first_name}, murojaatingiz matnini yozing:\n\n",
-            f"📌 Masalan:\n",
-            f"• 'Kanal haqida malumot kerak'\n",
-            f"• 'Kanalda reklama bermoqchi edim'\n",
-            f"• 'Dori haqida malumot kerak edi'\n",
-            f"• 'kasallik nomi yoki biron simptom yozgan holda qaysi shifokorga borishim kerak'\n\n",
-            f"⏰ {response_time}\n",
-            f"🕐 Ish vaqtlari: 09:00 - 18:00\n\n",
+            f"✍️ {user.first_name}, murojaatingiz matnini yozing:\n\n"
+            f"📌 Masalan:\n"
+            f"• 'One Piece manga 1050-qismi kerak'\n"
+            f"• 'Naruto manga ingliz tilida'\n"
+            f"• 'Attack on Titan oxirgi qismi'\n\n"
+            f"⏰ {response_time}\n"
+            f"🕐 Ish vaqtlari: 09:00 - 18:00\n\n"
             f"📝 Yorqin va aniq yozishingiz javob tezligini oshiradi!",
             reply_markup=ReplyKeyboardRemove()
         )
@@ -302,7 +301,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=f"🆕 YANGI SO'ROV #{request_id}\n\n"
                      f"👤 Foydalanuvchi: @{user.username or user.first_name}\n"
                      f"🆔 User ID: {user.id}\n"
-                     f"📱 Username: @{user.username or 'mavjud emas'}\n"
+                     f"📱 Username: @{user.username or 'Yoq'}\n"
                      f"📅 Vaqt: {format_time(get_current_time())}\n\n"
                      f"📝 XABAR:\n{message_text}\n\n"
                      f"✏️ JAVOB BERISH:\n"
