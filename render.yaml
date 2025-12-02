@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: manga-support-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: RENDER_EXTERNAL_URL
+        fromService:
+          name: manga-support-bot
+          type: web
+          property: url
+    healthCheckPath: /health
+    autoDeploy: true

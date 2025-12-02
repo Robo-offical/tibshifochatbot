@@ -1,0 +1,26 @@
+cd C:\Users\User\Desktop\chat
+
+REM .gitignore yaratish
+echo # Python cache > .gitignore
+echo __pycache__/ >> .gitignore
+echo *.py[cod] >> .gitignore
+echo *$py.class >> .gitignore
+echo .Python >> .gitignore
+echo env/ >> .gitignore
+echo venv/ >> .gitignore
+echo .env >> .gitignore
+echo >> .gitignore
+echo # Database >> .gitignore
+echo *.db >> .gitignore
+echo *.sqlite3 >> .gitignore
+echo backups/ >> .gitignore
+echo >> .gitignore
+echo # OS >> .gitignore
+echo .DS_Store >> .gitignore
+echo Thumbs.db >> .gitignore
+echo >> .gitignore
+echo # IDE >> .gitignore
+echo .vscode/ >> .gitignore
+echo .idea/ >> .gitignore
+echo *.swp >> .gitignore
+echo *.swo >> .gitignore
