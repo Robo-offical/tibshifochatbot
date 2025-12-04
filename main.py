@@ -4,13 +4,14 @@ import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from telegram.ext import Application, CommandHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from telegram import BotCommand
 import config
 from utils.database import init_db
 from utils.keep_alive import start_keep_alive
 from handlers.user_handlers import setup_user_handlers
-from handlers.admin_handlers import setup_admin_handlers  # ✅ YANGI
+from handlers.admin_handlers import setup_admin_handlers
+from handlers.message_handler import route_messages  # ✅ TO'G'RIDAN FUNKSIYANI IMPORT QILISH
 
 # Logging
 logging.basicConfig(
@@ -46,16 +47,24 @@ def main():
 
         init_db()
         
-        # IKKALA handler ni ham sozlash
-        setup_user_handlers(application)
-        setup_admin_handlers(application)  # ✅ Admin handlerlarini qo'shish
+        # 🔥 MUHIM: HANDLERLAR TARTIBI
+        # 1. BIRINCHI - Message handlerlarni qo'shamiz
+        # BU eng BIRINCHI bo'lishi kerak, chunki u barcha xabarlarni qabul qiladi
+        application.add_handler(MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            route_messages
+        ))
+        
+        # 2. Command handlerlarni sozlash
+        setup_user_handlers(application)     # /start, /time, /myrequests, /help, /cancel
+        setup_admin_handlers(application)    # /admin, /reply, /requestinfo, etc.
 
         start_keep_alive()
 
         logger.info(f"✅ Bot muvaffaqiyatli ishga tushdi (Port: {config.PORT})")
         logger.info(f"👑 Admin ID: {config.ADMIN_ID}")
         logger.info(f"👥 Guruh ID: {config.GROUP_ID}")
-        logger.info(f"📢 Kanal: @{config.CHANNEL_USERNAME}")
+        logger.info(f"📢 Kanallar: {config.CHANNEL_USERNAMES}")
         
         application.run_polling(
             allowed_updates=["message"], 

@@ -415,67 +415,95 @@ async def handle_admin_messages(update: Update, context: ContextTypes.DEFAULT_TY
     elif message_text == "⬅️ Orqaga":
         await update.message.reply_text("👑 Admin Panel", reply_markup=ADMIN_KEYBOARD)
     
-    # Broadcast xabarini qayta ishlash
+        # Broadcast xabarini qayta ishlash
     elif 'waiting_for_broadcast' in context.user_data and user.id == config.ADMIN_ID:
+        broadcast_message = message_text  # Xabarni saqlaymiz
         await update.message.reply_text("⏳ Broadcast bajarilmoqda...", reply_markup=ADMIN_KEYBOARD)
         
         users = get_all_users()
         success = 0
         failed = 0
+        total_users = len(users)
         
-        for user_id in users[:50]:  # Test uchun faqat 50 tasiga
+        # Progress xabari
+        progress_msg = await update.message.reply_text(f"⏳ 0/{total_users}...")
+        
+        for index, user_id in enumerate(users, 1):
             try:
                 # Kanalga obuna bo'lishni tekshirish
                 is_subscribed = await check_channel_subscription(context.bot, user_id)
                 
                 if not is_subscribed:
-                    continue
+                    continue  # Obuna bo'lmaganlarga yubormaymiz
                 
                 await context.bot.send_message(
                     chat_id=user_id,
-                    text=f"📢 Botdan xabar:\n\n{message_text}\n\n"
-                         f"📢 @{config.CHANNEL_USERNAME} kanaliga obuna bo'ling!"
+                    text=f"📢 Botdan xabar:\n\n{broadcast_message}\n\n"
+                         f"📢 @{config.CHANNEL_USERNAMES[0]} kanaliga obuna bo'ling!"
                 )
                 success += 1
                 
-                # Tezlikni cheklash
-                if success % 5 == 0:
+                # Har 10ta xabardan keyin progress yangilash
+                if index % 10 == 0:
+                    await progress_msg.edit_text(
+                        f"⏳ {index}/{total_users} yuborildi...\n"
+                        f"✅ Muvaffaqiyatli: {success}\n"
+                        f"❌ Xatolik: {failed}"
+                    )
+                
+                # Tezlikni cheklash (sekundiga 5ta xabar)
+                if index % 5 == 0:
                     await asyncio.sleep(1)
                     
             except Exception as e:
                 failed += 1
                 logger.error(f"Xabar yuborishda xatolik {user_id}: {e}")
         
+        # Progress xabarini o'chirish
+        await progress_msg.delete()
+        
         del context.user_data['waiting_for_broadcast']
         
         await update.message.reply_text(
             f"✅ Broadcast yakunlandi!\n\n"
-            f"✅ Muvaffaqiyatli: {success}\n"
-            f"❌ Xatolik: {failed}",
+            f"📊 Statistikalar:\n"
+            f"• 👥 Jami foydalanuvchilar: {total_users}\n"
+            f"• ✅ Muvaffaqiyatli: {success}\n"
+            f"• ❌ Xatolik: {failed}\n"
+            f"• 📤 Yuborilmagan (obuna emas): {total_users - success - failed}",
             reply_markup=ADMIN_KEYBOARD
         )
     
-    # Qidiruvni qayta ishlash
+        # Qidiruvni qayta ishlash
     elif 'waiting_for_search' in context.user_data and user.id == config.ADMIN_ID:
-        results = search_user(message_text)
+        if not message_text.strip():
+            await update.message.reply_text("❌ Qidiruv matnini kiriting!", reply_markup=ADMIN_KEYBOARD)
+            del context.user_data['waiting_for_search']
+            return
+            
+        results = search_user(message_text.strip())
         
         if not results:
             text = "❌ Hech qanday foydalanuvchi topilmadi."
         else:
             text = f"🔍 Natijalar ({len(results)} ta):\n\n"
-            for user_data in results[:10]:
+            for user_data in results[:10]:  # Faqat 10 tasini ko'rsatish
                 user_id = user_data[1]
-                username = user_data[2] if user_data[2] else "Mavjud emas"
-                first_name = user_data[3] if user_data[3] else "Mavjud emas"
-                last_name = user_data[4] if user_data[4] else "Mavjud emas"
+                username = f"@{user_data[2]}" if user_data[2] else "Yo'q"
+                first_name = user_data[3] if user_data[3] else "Yo'q"
+                last_name = user_data[4] if user_data[4] else "Yo'q"
                 joined_date = user_data[5]
                 
                 text += f"👤 ID: {user_id}\n"
-                text += f"📱 Username: @{username}\n"
+                text += f"📱 Username: {username}\n"
                 text += f"👤 Ism: {first_name}\n"
                 text += f"👥 Familiya: {last_name}\n"
                 text += f"📅 Qo'shilgan: {joined_date}\n"
-                text += "─" * 20 + "\n"
+                text += f"🔗 Profil: /user_{user_id}\n"
+                text += "─" * 25 + "\n"
+        
+        if len(results) > 10:
+            text += f"\n...va yana {len(results) - 10} ta natija"
         
         del context.user_data['waiting_for_search']
         
@@ -557,7 +585,7 @@ async def check_channel_subscription(bot, user_id):
 
 def setup_admin_handlers(application):
     """Admin va guruh handlerlarini sozlash"""
-    # Guruh komandalari (har kim uchun)
+    # Faqat command handlerlarni qo'shamiz
     application.add_handler(CommandHandler("reply", reply_command))
     application.add_handler(CommandHandler("requestinfo", requestinfo_command))
     application.add_handler(CommandHandler("allrequests", allrequests_command))
@@ -567,8 +595,8 @@ def setup_admin_handlers(application):
     application.add_handler(CommandHandler("addadmin", addadmin_command))
     application.add_handler(CommandHandler("admin", admin_command))
     
-    # Admin xabarlarini qayta ishlash
-    application.add_handler(MessageHandler(
-        filters.TEXT & ~filters.COMMAND, 
-        handle_admin_messages
-    ))
+    # MESSAGE HANDLERLARNI O'CHIRAMIZ - ular message_handler.py da
+    # application.add_handler(MessageHandler(
+    #     filters.TEXT & ~filters.COMMAND, 
+    #     handle_admin_messages
+    # ))

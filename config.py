@@ -8,8 +8,8 @@ BOT_TOKEN = "8235666144:AAFecPc75t87SglLcOKYJHmlrKv8FP1ZB_Y"
 ADMIN_ID = 5796033703
 GROUP_ID = -1003204703868
 
-# Kanal sozlamalari
-CHANNEL_USERNAME = "tibshifouz"
+# Kanal sozlamalari - IKKITA KANAL QO'SHING
+CHANNEL_USERNAMES = ["tibshifouz", "pulsecare"]  # 🔥 YANGILANDI - array formatda
 
 # Ma'lumotlar bazasi
 DATABASE_NAME = "tibshifo_support.db"

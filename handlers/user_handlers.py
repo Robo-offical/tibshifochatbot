@@ -1,17 +1,15 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import ContextTypes, CommandHandler, MessageHandler, filters
+from telegram.ext import ContextTypes, CommandHandler
 import config
 import logging
 from utils.database import (
-    add_user, add_request, get_user_requests, 
-    update_user_activity, get_user_by_id
+    add_user, update_user_activity, get_user_by_id
 )
 from utils.channel_check import check_channel_subscription
 from utils.time_utils import (
     get_current_time, format_time, 
     get_working_hours_message, get_response_time_estimate
 )
-from handlers.admin_handlers import ADMIN_KEYBOARD
 
 logger = logging.getLogger(__name__)
 
@@ -23,22 +21,26 @@ USER_KEYBOARD = ReplyKeyboardMarkup([
 ], resize_keyboard=True, one_time_keyboard=False)
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Start komandasi - kanalga obuna bo'lishni tekshiradi"""
+    """Start komandasi - BARCHA kanallarga obuna bo'lishni tekshiradi"""
     user = update.effective_user
     
     # Foydalanuvchi faolligini yangilash
     update_user_activity(user.id)
     
-    # Kanalga obuna bo'lishni tekshirish
+    # BARCHA kanallarga obuna bo'lishni tekshirish
     is_subscribed = await check_channel_subscription(context.bot, user.id)
     
     if not is_subscribed:
+        kanal_list = "\n".join([f"• @{channel}" for channel in config.CHANNEL_USERNAMES])
+        
         await update.message.reply_text(
             f"👋 Salom {user.first_name}!\n\n"
-            f"❌ Botdan foydalanish uchun quyidagi kanalga obuna bo'lishingiz kerak:\n"
-            f"👉 @{config.CHANNEL_USERNAME}\n\n"
-            f"✅ Obuna bo'lgach, /start buyrug'ini qayta yuboring.\n\n"
-            f"📢 Kanal linki: https://t.me/{config.CHANNEL_USERNAME}",
+            f"❌ Botdan foydalanish uchun quyidagi kanallarning BARCHASIGA obuna bo'lishingiz kerak:\n"
+            f"{kanal_list}\n\n"
+            f"✅ Ikkala kanalga ham obuna bo'lgach, /start buyrug'ini qayta yuboring.\n\n"
+            f"📢 Kanal linklari:\n"
+            f"• https://t.me/{config.CHANNEL_USERNAMES[0]}\n"
+            f"• https://t.me/{config.CHANNEL_USERNAMES[1]}",
             reply_markup=ReplyKeyboardRemove(),
             disable_web_page_preview=True
         )
@@ -52,6 +54,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Admin yoki oddiy foydalanuvchi uchun keyboard
     if user.id == config.ADMIN_ID:
+        from handlers.admin_handlers import ADMIN_KEYBOARD
         await update.message.reply_text(
             f"👑 Salom {user.first_name}! Admin paneliga xush kelibsiz!\n\n"
             f"📅 Joriy vaqt: {time_str}\n"
@@ -64,6 +67,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     else:
         # Oddiy foydalanuvchining oldingi so'rovlari soni
+        from utils.database import get_user_requests
         user_requests = get_user_requests(user.id)
         request_count = len(user_requests) if user_requests else 0
         
@@ -115,12 +119,13 @@ async def time_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📅 Joriy vaqt: {time_str}\n"
         f"🌏 Vaqt zonasi: {config.TIMEZONE}\n"
         f"⏰ Ish vaqtlari: 09:00 - 18:00\n"
-        f"📢 Kanal: @{config.CHANNEL_USERNAME}\n\n"
+        f"📢 Kanallar: @{config.CHANNEL_USERNAMES[0]}, @{config.CHANNEL_USERNAMES[1]}\n\n"
         f"{get_working_hours_message()}\n"
         f"{get_response_time_estimate()}\n\n"
         f"ℹ️ Eslatma: Adminlar ish vaqtlarida tezroq javob beradi."
     )
     
+    from handlers.admin_handlers import ADMIN_KEYBOARD
     keyboard = ADMIN_KEYBOARD if user.id == config.ADMIN_ID else USER_KEYBOARD
     await update.message.reply_text(text, reply_markup=keyboard)
 
@@ -130,6 +135,8 @@ async def myrequests_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     # Foydalanuvchi faolligini yangilash
     update_user_activity(user.id)
+    
+    from utils.database import get_user_requests
     
     requests = get_user_requests(user.id)
     
@@ -169,6 +176,7 @@ async def myrequests_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         text += f"• 📨 Umumiy: {len(requests)}\n\n"
         text += f"➕ Yangi so'rov: '📨 Murojaat yuborish'"
     
+    from handlers.admin_handlers import ADMIN_KEYBOARD
     keyboard = ADMIN_KEYBOARD if user.id == config.ADMIN_ID else USER_KEYBOARD
     await update.message.reply_text(text, reply_markup=keyboard)
 
@@ -196,7 +204,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{'• /admin - Admin panel' if user.id == config.ADMIN_ID else ''}\n\n"
         
         f"📌 QO'LLANMA:\n"
-        f"1. Avval @{config.CHANNEL_USERNAME} kanaliga obuna bo'ling\n"
+        f"1. Avval @{config.CHANNEL_USERNAMES[0]} va @{config.CHANNEL_USERNAMES[1]} kanallariga obuna bo'ling\n"
         f"2. '📨 Murojaat yuborish' tugmasini bosing\n"
         f"3. kanal yoki boshqa masaladagi so'rovingizni yozing\n"
         f"4. Adminlar so'rovingizni ko'rib chiqib javob beradi\n\n"
@@ -208,154 +216,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"• Takroriy so'rov yubormaslikka harakat qiling"
     )
     
+    from handlers.admin_handlers import ADMIN_KEYBOARD
     keyboard = ADMIN_KEYBOARD if user.id == config.ADMIN_ID else USER_KEYBOARD
     await update.message.reply_text(text, reply_markup=keyboard)
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Foydalanuvchi xabarlarini qayta ishlash"""
-    user = update.effective_user
-    message_text = update.message.text
-    
-    # Foydalanuvchi faolligini yangilash
-    update_user_activity(user.id)
-    
-    # Kanalga obuna bo'lishni tekshirish
-    is_subscribed = await check_channel_subscription(context.bot, user.id)
-    
-    if not is_subscribed:
-        await update.message.reply_text(
-            f"❌ {user.first_name}, kanalga obuna bo'lmagansiz!\n\n"
-            f"Botdan foydalanish uchun quyidagi kanalga obuna bo'ling:\n"
-            f"👉 @{config.CHANNEL_USERNAME}\n\n"
-            f"✅ Obuna bo'lgach, /start buyrug'ini yuboring.\n"
-            f"🔗 Link: https://t.me/{config.CHANNEL_USERNAME}",
-            reply_markup=ReplyKeyboardRemove(),
-            disable_web_page_preview=True
-        )
-        return
-    
-    # Reply keyboard orqali tanlov
-    if message_text == "📨 Murojaat yuborish":
-        context.user_data['waiting_for_request'] = True
-        response_time = get_response_time_estimate()
-        
-        await update.message.reply_text(
-            f"✍️ {user.first_name}, murojaatingiz matnini yozing:\n\n"
-            f"📌 Masalan:\n"
-            f"• 'Tib Shifo kanali haqida malumot'\n"
-            f"• 'Kanal qanday materiallar beradi?'\n"
-            f"• 'boshqa tibbiyotga oid savollar'\n\n"
-            f"⏰ {response_time}\n"
-            f"🕐 Ish vaqtlari: 09:00 - 18:00\n\n"
-            f"📝 Yorqin va aniq yozishingiz javob tezligini oshiradi!",
-            reply_markup=ReplyKeyboardRemove()
-        )
-    
-    elif message_text == "📋 Mening so'rovlarim":
-        await myrequests_command(update, context)
-    
-    elif message_text == "🕐 Ish vaqtlari":
-        await time_command(update, context)
-    
-    elif message_text == "ℹ️ Yordam":
-        await help_command(update, context)
-    
-    # Admin funksiyalari (user_handlers.py da admin_handlers ni import qilmasdan)
-    elif user.id == config.ADMIN_ID and message_text in [
-        "📊 Statistika", "📢 Broadcast", "📋 Support", "🔍 Qidirish"
-    ]:
-        # Admin funksiyalari uchun alohida import
-        from handlers.admin_handlers import (
-            handle_support_panel, handle_admin_messages
-        )
-        
-        if message_text == "📋 Support":
-            await handle_support_panel(update, context)
-        else:
-            await handle_admin_messages(update, context)
-    
-    # Agar foydalanuvchi so'rov yuborish rejimida bo'lsa
-    elif 'waiting_for_request' in context.user_data:
-        # Xabar uzunligini tekshirish
-        if len(message_text) < 5:
-            await update.message.reply_text(
-                "❌ Xabar juda qisqa! Iltimos, kamida 5 ta belgidan iborat bo'lsin.\n"
-                "Qaytadan yozing:"
-            )
-            return
-        
-        if len(message_text) > 2000:
-            await update.message.reply_text(
-                "❌ Xabar juda uzun! Iltimos, 2000 ta belgidan oshmasligi kerak.\n"
-                "Qaytadan qisqaroq yozing:"
-            )
-            return
-        
-        # So'rovni bazaga saqlash
-        request_id = add_request(user.id, message_text)
-        
-        # Guruhga yaxshiroq formatda xabar yuborish
-        try:
-            await context.bot.send_message(
-                chat_id=config.GROUP_ID,
-                text=f"🆕 YANGI SO'ROV #{request_id}\n\n"
-                     f"👤 Foydalanuvchi: @{user.username or user.first_name}\n"
-                     f"🆔 User ID: {user.id}\n"
-                     f"📱 Username: @{user.username or 'Yoq'}\n"
-                     f"📅 Vaqt: {format_time(get_current_time())}\n\n"
-                     f"📝 XABAR:\n{message_text}\n\n"
-                     f"✏️ JAVOB BERISH:\n"
-                     f"/reply {request_id} [javob matni]\n\n"
-                     f"📄 SO'ROV MA'LUMOTI:\n"
-                     f"/requestinfo {request_id}\n\n"
-                     f"📋 BARCHA SO'ROVLAR:\n"
-                     f"/allrequests",
-                disable_web_page_preview=True
-            )
-        except Exception as e:
-            logger.error(f"❌ Guruhga xabar yuborishda xatolik: {e}")
-            # Guruhga yuborishda xatolik bo'lsa ham foydalanuvchiga xabar beramiz
-        
-        # Foydalanuvchiga tasdiqlash
-        response_time = get_response_time_estimate()
-        
-        keyboard = ADMIN_KEYBOARD if user.id == config.ADMIN_ID else USER_KEYBOARD
-        
-        await update.message.reply_text(
-            f"✅ {user.first_name}, murojaatingiz qabul qilindi!\n\n"
-            f"📨 So'rov raqami: #{request_id}\n"
-            f"⏰ {response_time}\n"
-            f"📊 Holat: ⏳ Kutayotgan\n\n"
-            f"📌 So'rov holatini '📋 Mening so'rovlarim' tugmasi orqali kuzatishingiz mumkin.\n"
-            f"📞 Adminlar tez orada siz bilan bog'lanishadi.",
-            reply_markup=keyboard
-        )
-        
-        # Rejimni tozalash
-        del context.user_data['waiting_for_request']
-    
-    # Agar hech qaysi holatga to'g'ri kelmasa
-    else:
-        # Spam yoki notanish xabarlarga javob
-        if len(message_text) > 1000:  # Uzun xabarlar
-            await update.message.reply_text(
-                "📝 Iltimos, xabaringizni qisqaroq qilib yozing.\n"
-                "Yoki '📨 Murojaat yuborish' tugmasi orqali so'rov yuboring.",
-                reply_markup=USER_KEYBOARD if user.id != config.ADMIN_ID else ADMIN_KEYBOARD
-            )
-        else:
-            # Oddiy xabarlar uchun yordam berish
-            keyboard = ADMIN_KEYBOARD if user.id == config.ADMIN_ID else USER_KEYBOARD
-            
-            await update.message.reply_text(
-                f"👋 {user.first_name}! Pastdagi tugmalardan foydalaning:\n\n"
-                f"• 📨 Murojaat yuborish - Yangi so'rov\n"
-                f"• 📋 Mening so'rovlarim - Oldingi so'rovlar\n"
-                f"• 🕐 Ish vaqtlari - Adminlar ish vaqtlari\n"
-                f"• ℹ️ Yordam - Bot haqida ma'lumot\n\n"
-                f"📝 Yordam kerak bo'lsa /help buyrug'idan foydalaning.",
-                reply_markup=keyboard
-            )
 
 async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bekor qilish komandasi"""
@@ -368,6 +231,7 @@ async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if key in context.user_data:
             del context.user_data[key]
     
+    from handlers.admin_handlers import ADMIN_KEYBOARD
     keyboard = ADMIN_KEYBOARD if user.id == config.ADMIN_ID else USER_KEYBOARD
     
     await update.message.reply_text(
@@ -378,9 +242,12 @@ async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def setup_user_handlers(application):
     """Foydalanuvchi handlerlarini sozlash"""
+    # FAQAT command handlerlarni qo'shamiz
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("time", time_command))
     application.add_handler(CommandHandler("myrequests", myrequests_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("cancel", cancel_command))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    # MESSAGE HANDLERLARNI O'CHIRAMIZ - ular message_handler.py da
+    # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
