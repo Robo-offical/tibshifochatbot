@@ -72,7 +72,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         request_count = len(user_requests) if user_requests else 0
         
         welcome_text = (
-            f"👋 Salom {user.first_name}! Tib Shifo support botiga xush kelibsiz!\n\n"
+            f"👋 Salom {user.first_name}! @aisroilov support botiga xush kelibsiz!\n\n"
             f"📅 Joriy vaqt: {time_str}\n"
             f"⏰ {get_working_hours_message()}\n\n"
         )
@@ -188,10 +188,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_user_activity(user.id)
     
     text = (
-        f"ℹ️ {user.first_name}, Tib Shifo support bot yordami:\n\n"
+        f"ℹ️ {user.first_name}, @aisroilov support bot yordami:\n\n"
         
         f"📌 ASOSIY FUNKSIYALAR:\n"
-        f"1. '📨 Murojaat yuborish' - Tib Shifo kanali haqida yoki boshqa masalada so'rov yuborish\n"
+        f"1. '📨 Murojaat yuborish' - Kanallar haqida yoki boshqa masalada so'rov yuborish\n"
         f"2. '📋 Mening so'rovlarim' - Yuborgan so'rovlaringiz holati\n"
         f"3. '🕐 Ish vaqtlari' - Adminlar ish vaqtlari\n\n"
         

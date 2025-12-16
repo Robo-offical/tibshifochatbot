@@ -152,11 +152,11 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.message.reply_text(
             f"✍️ {user.first_name}, murojaatingiz matnini yozing:\n\n"
             f"📌 Masalan:\n"
-            f"• 'Tib Shifo kanali haqida malumot'\n"
+            f"• 'murojat yuboruvchini qiziqtirgan savollar'\n"
             f"• 'Kanal qanday materiallar beradi?'\n"
             f"• 'boshqa tibbiyotga oid savollar'\n\n"
             f"⏰ {response_time}\n"
-            f"🕐 Ish vaqtlari: 09:00 - 18:00\n\n"
+            f"🕐 Ish vaqtlari: 08:00 - 23:00\n\n"
             f"📝 Yorqin va aniq yozishingiz javob tezligini oshiradi!",
             reply_markup=ReplyKeyboardRemove()
         )
@@ -245,6 +245,7 @@ async def show_working_hours(update: Update, context: ContextTypes.DEFAULT_TYPE,
         f"📅 Joriy vaqt: {time_str}\n"
         f"🌏 Vaqt zonasi: {config.TIMEZONE}\n"
         f"⏰ Ish vaqtlari: 09:00 - 18:00\n"
+        f"⏰ 18:00 dan keyin ham soat 23:00gacha yozishingiz mumkin."
         f"📢 Kanallar: @{config.CHANNEL_USERNAMES[0]}, @{config.CHANNEL_USERNAMES[1]}\n\n"
         f"{get_working_hours_message()}\n"
         f"{get_response_time_estimate()}\n\n"
@@ -258,10 +259,10 @@ async def show_working_hours(update: Update, context: ContextTypes.DEFAULT_TYPE,
 async def show_help(update: Update, context: ContextTypes.DEFAULT_TYPE, user):
     """Yordam ma'lumotlari"""
     text = (
-        f"ℹ️ {user.first_name}, Tib Shifo support bot yordami:\n\n"
+        f"ℹ️ {user.first_name}, @aisroilov support bot yordami:\n\n"
         
         f"📌 ASOSIY FUNKSIYALAR:\n"
-        f"1. '📨 Murojaat yuborish' - Tib Shifo kanali haqida yoki boshqa masalada so'rov yuborish\n"
+        f"1. '📨 Murojaat yuborish' - Kanallar haqida yoki boshqa masalada so'rov yuborish\n"
         f"2. '📋 Mening so'rovlarim' - Yuborgan so'rovlaringiz holati\n"
         f"3. '🕐 Ish vaqtlari' - Adminlar ish vaqtlari\n\n"
         

@@ -27,7 +27,7 @@ async def post_init(application):
         BotCommand("admin", "Admin panel (faqat adminlar uchun)"),
         BotCommand("myrequests", "Mening so'rovlarim"),
         BotCommand("time", "Joriy vaqt va ish soatlari"),
-        BotCommand("help", "Tib Shifo Bot yordami"),
+        BotCommand("help", "@aisroilov support Bot yordami"),
         BotCommand("cancel", "Bekor qilish"),
         BotCommand("reply", "Foydalanuvchiga javob berish"),
         BotCommand("requestinfo", "So'rov haqida ma'lumot"),
