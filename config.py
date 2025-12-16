@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 # Bot tokeni
-BOT_TOKEN = "8235666144:AAFecPc75t87SglLcOKYJHmlrKv8FP1ZB_Y"
+BOT_TOKEN = "5842293465:AAF-9_F7mn-jRdY7xILMYNNKZlxPkpWIHaY"
 
 # Admin va guruh IDlari
 ADMIN_ID = 5796033703
