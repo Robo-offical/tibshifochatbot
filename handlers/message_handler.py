@@ -244,8 +244,9 @@ async def show_working_hours(update: Update, context: ContextTypes.DEFAULT_TYPE,
         f"🕐 Vaqt ma'lumotlari:\n\n"
         f"📅 Joriy vaqt: {time_str}\n"
         f"🌏 Vaqt zonasi: {config.TIMEZONE}\n"
-        f"⏰ Ish vaqtlari: 09:00 - 18:00\n"
-        f"⏰ 18:00 dan keyin ham soat 23:00gacha yozishingiz mumkin."
+        f"⏰ Ish vaqtlari: 09:00 - 18:00, 18:30 - 23:00\n"
+        f"⏰ 18:00 dan keyin ham soat 23:00gacha yozishingiz mumkin\n"
+        
         f"📢 Kanallar: @{config.CHANNEL_USERNAMES[0]}, @{config.CHANNEL_USERNAMES[1]}\n\n"
         f"{get_working_hours_message()}\n"
         f"{get_response_time_estimate()}\n\n"
@@ -281,7 +282,9 @@ async def show_help(update: Update, context: ContextTypes.DEFAULT_TYPE, user):
         f"4. Adminlar so'rovingizni ko'rib chiqib javob beradi\n\n"
         
         f"📌 ESLATMALAR:\n"
-        f"• Adminlar 09:00-18:00 orasida javob beradi\n"
+        f"• Adminlar 09:00-18:00 orasida tezroq\n"
+        f"• 18:00 dan keyin ham javob beradi lekin biroz sekinroq javob beradi\n"
+        
         f"• Har bir so'rovga alohida javob beriladi\n"
         f"• So'rov holatini '📋 Mening so'rovlarim' dan kuzating\n"
         f"• Takroriy so'rov yubormaslikka harakat qiling"
